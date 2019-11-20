@@ -11,6 +11,7 @@ public class Tetris extends JFrame {
     private JLabel score;
     private JLabel lines;
     private JLabel time;
+    private boolean isSolverOn = false;
 
     private Tetris() {
         score = new JLabel("0");
@@ -28,13 +29,18 @@ public class Tetris extends JFrame {
         JMenuItem newg = new JMenuItem("New");
         JMenu set = new JMenu("Settings");
         JMenuItem exit = new JMenuItem("Exit");
-        JCheckBoxMenuItem solver = new JCheckBoxMenuItem("Turn on/off Solver");
+        JCheckBoxMenuItem solver = new JCheckBoxMenuItem("Turn on solver");
         JMenu speed = new JMenu("Game Speed");
         JRadioButton speed1 = new JRadioButton("1", true);
+        speed1.setMnemonic('1');
         JRadioButton speed2 = new JRadioButton("2", false);
+        speed2.setMnemonic('2');
         JRadioButton speed3 = new JRadioButton("3", false);
+        speed3.setMnemonic('3');
         JRadioButton speed4 = new JRadioButton("4", false);
+        speed4.setMnemonic('4');
         JRadioButton speed5 = new JRadioButton("5", false);
+        speed5.setMnemonic('5');
 
         speed1.addActionListener(e -> board.timer.setDelay(1000));
         speed2.addActionListener(e -> board.timer.setDelay(800));
@@ -54,8 +60,8 @@ public class Tetris extends JFrame {
         speed.add(speed5);
         solver.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK));
         set.add(solver).addActionListener(e -> {
-            Board.isSolverOn = !Board.isSolverOn;
-            solver(board);
+            isSolverOn = !isSolverOn;
+            solver(board, isSolverOn);
         });
         set.add(speed);
         menu.add(newg).addActionListener(e -> board.start());
@@ -66,11 +72,11 @@ public class Tetris extends JFrame {
         JMenu help = new JMenu("Help");
         JMenuItem about = new JMenuItem("About");
         JMenuItem control = new JMenuItem("Controls");
-        help.add(about).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this, "Это Тетрис.",
+        help.add(about).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this, "Это Тетрис. С решателем.",
                 "About", JOptionPane.INFORMATION_MESSAGE));
         help.add(control).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this,
-                new String[]{"Вверх - поворот вправо", "Влево - переместить влево", "Вправо - переместить вправо",
-                        "Вниз - опустить на одну линию", "Пробел - опустить вниз", "P - пауза", "R - рестарт"},
+                new String[]{"Вверх - поворот влево", "Влево - переместить влево", "Вправо - переместить вправо",
+                        "Вниз - опустить на одну линию", "Пробел - опустить вниз", "P - пауза", "R - рестарт", "Shift + S - включить решателя/увеличить скорость решателя"},
                 "Controls",
                 JOptionPane.WARNING_MESSAGE));
         menuBar.add(menu);

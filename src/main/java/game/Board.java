@@ -18,8 +18,8 @@ public class Board extends JPanel implements ActionListener {
     private static boolean isFallingFinished = false;
     Timer timer;
     private Timer timerStats;
-    private boolean isStarted = false;
-    private boolean isPaused = false;
+    public boolean isStarted = false;
+    public boolean isPaused = false;
     private int numLinesRemoved = 0;
     private int curX = 0;
     private int curY = 0;
@@ -29,15 +29,9 @@ public class Board extends JPanel implements ActionListener {
     private JLabel time;
     private LocalDateTime startTime;
     private Shape curPiece;
-    private Tetrominoe[] board;
-    public static boolean isSolverOn = false;
+    private Tetrominoe[][] board;
 
-
-    public void setCurX(int curX) {
-        this.curX = curX;
-    }
-
-    public Tetrominoe[] getBoard() {
+    public Tetrominoe[][] getBoard() {
         return board;
     }
 
@@ -49,7 +43,7 @@ public class Board extends JPanel implements ActionListener {
         return nextPiece;
     }
 
-    public Board(Tetris parent) {
+    Board(Tetris parent) {
         setFocusable(true);
         setPreferredSize(new Dimension(260, 460));
         next = new Next();
@@ -69,7 +63,7 @@ public class Board extends JPanel implements ActionListener {
         });
 
         timer = new Timer(800, this);
-        board = new Tetrominoe[BOARD_WIDTH * BOARD_HEIGHT];
+        board = new Tetrominoe[BOARD_WIDTH][BOARD_HEIGHT];
         clearBoard();
         addKeyListener(new TetrisAdapter());
     }
@@ -93,21 +87,23 @@ public class Board extends JPanel implements ActionListener {
         return (int) getSize().getHeight() / BOARD_HEIGHT;
     }
 
-    public Tetrominoe shapeAt(int x, int y) {
-        return board[y * BOARD_WIDTH + x];
+    private Tetrominoe shapeAt(int x, int y) {
+        return board[x][y];
     }
 
     private void clearBoard() {
-        for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++) {
-            board[i] = Tetrominoe.NoShape;
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
+                board[x][y] = Tetrominoe.NoShape;
+            }
         }
     }
 
     private void pieceDropped() {
         for (int i = 0; i < 4; i++) {
             int x = curX + curPiece.x(i);
-            int y = curY - curPiece.y(i);
-            board[y * BOARD_WIDTH + x] = curPiece.getShape();
+            int y = curY + curPiece.y(i);
+            board[x][y] = curPiece.getShape();
         }
         removeFullLines();
         if (!isFallingFinished) {
@@ -173,7 +169,7 @@ public class Board extends JPanel implements ActionListener {
         if (curPiece.getShape() != Tetrominoe.NoShape) {
             for (int i = 0; i < 4; ++i) {
                 int x = curX + curPiece.x(i);
-                int y = curY - curPiece.y(i);
+                int y = curY + curPiece.y(i);
                 drawSquare(g, x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape());
             }
         }
@@ -185,9 +181,9 @@ public class Board extends JPanel implements ActionListener {
         isStarted = true;
         isFallingFinished = false;
         numLinesRemoved = 0;
+        scoreInt = 0;
         clearBoard();
         newPiece();
-        scoreInt = 0;
         timer.start();
         startTime = LocalDateTime.now();
         timerStats.start();
@@ -205,7 +201,7 @@ public class Board extends JPanel implements ActionListener {
         } else {
             timer.start();
             timerStats.start();
-            score.setText(String.valueOf(numLinesRemoved));
+            score.setText(String.valueOf(scoreInt));
         }
         repaint();
     }
@@ -213,7 +209,7 @@ public class Board extends JPanel implements ActionListener {
     public boolean tryMove(Shape newPiece, int newX, int newY) {
         for (int i = 0; i < 4; ++i) {
             int x = newX + newPiece.x(i);
-            int y = newY - newPiece.y(i);
+            int y = newY + newPiece.y(i);
             if (x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
                 return false;
             if (shapeAt(x, y) != Tetrominoe.NoShape)
@@ -240,35 +236,34 @@ public class Board extends JPanel implements ActionListener {
                 numFullLines++;
                 for (int k = i; k < BOARD_HEIGHT - 1; ++k) {
                     for (int j = 0; j < BOARD_WIDTH; ++j) {
-                        board[k * BOARD_WIDTH + j] = shapeAt(j, k + 1);
+                        board[j][k] = shapeAt(j, k + 1);
                     }
                 }
             }
-            if (numFullLines > 0) {
-                numLinesRemoved += numFullLines;
-                switch (numFullLines) {
-                    case 1:
-                        scoreInt += 100;
-                        break;
-                    case 2:
-                        scoreInt += 300;
-                        break;
-                    case 3:
-                        scoreInt += 700;
-                        break;
-                    case 4:
-                        scoreInt += 1500;
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + numFullLines);
-                }
-                numFullLines = 0;
-                lines.setText(String.valueOf(numLinesRemoved));
-                score.setText(String.valueOf(scoreInt /* * (1000 / timer.getDelay())*/));
-                isFallingFinished = true;
-                curPiece.setShape(Tetrominoe.NoShape);
-                repaint();
+        }
+        if (numFullLines > 0) {
+            numLinesRemoved += numFullLines;
+            switch (numFullLines) {
+                case 4:
+                    scoreInt += 1500 * (1000 / timer.getDelay());
+                    break;
+                case 3:
+                    scoreInt += 700 * (1000 / timer.getDelay());
+                    break;
+                case 2:
+                    scoreInt += 300 * (1000 / timer.getDelay());
+                    break;
+                case 1:
+                    scoreInt += 100 * (1000 / timer.getDelay());
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + numFullLines);
             }
+            lines.setText(String.valueOf(numLinesRemoved));
+            score.setText(String.valueOf(scoreInt));
+            isFallingFinished = true;
+            curPiece.setShape(Tetrominoe.NoShape);
+            repaint();
         }
     }
 
@@ -306,7 +301,7 @@ public class Board extends JPanel implements ActionListener {
                         oneLineDown();
                         break;
                     case KeyEvent.VK_UP:
-                        tryMove(curPiece.rotateRight(), curX, curY);
+                        tryMove(curPiece.rotateLeft(), curX, curY);
                         break;
                     case KeyEvent.VK_SPACE:
                         dropDown();

@@ -20,7 +20,7 @@ public class Shape {
     }
 
     private void setY(int index, int y) {
-        coords[index][1] = -y;
+        coords[index][1] = y;
     }
 
     public int x(int index) {
@@ -28,7 +28,7 @@ public class Shape {
     }
 
     public int y(int index) {
-        return -coords[index][1];
+        return coords[index][1];
     }
 
     public Tetrominoe getShape() {
@@ -51,7 +51,7 @@ public class Shape {
         setShape(bag.removeFirst());
     }
 
-    public int minY() {
+    int minY() {
         int m = coords[0][1];
         for (int i = 0; i < 4; i++) {
             m = Math.min(m, coords[i][1]);
@@ -59,7 +59,7 @@ public class Shape {
         return m;
     }
 
-    public Shape rotateRight() {
+    public Shape rotateLeft() {
         if (pieceShape == Tetrominoe.O)
             return this;
         Shape result = new Shape();

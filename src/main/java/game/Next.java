@@ -6,11 +6,11 @@ import java.awt.*;
 import static game.Board.nextPiece;
 
 public class Next extends JPanel {
-    private Tetrominoe[] boardNext;
+    private Tetrominoe[][] boardNext;
 
     Next() {
         setPreferredSize(new Dimension(150, 180));
-        boardNext = new Tetrominoe[5 * 5];
+        boardNext = new Tetrominoe[5][5];
         clearBoard();
     }
 
@@ -20,8 +20,10 @@ public class Next extends JPanel {
     }
 
     private void clearBoard() {
-        for (int i = 0; i < 25; i++) {
-            boardNext[i] = Tetrominoe.NoShape;
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                boardNext[x][y] = Tetrominoe.NoShape;
+            }
         }
     }
 
@@ -33,7 +35,7 @@ public class Next extends JPanel {
         if (nextPiece.getShape() != Tetrominoe.NoShape) {
             for (int i = 0; i < 4; ++i) {
                 int x = nextPiece.x(i);
-                int y = -nextPiece.y(i);
+                int y = nextPiece.y(i);
                 drawSquare(g, (x + 1) * 30, boardTop + (5 - y - 3) * 30, nextPiece.getShape());
             }
         }
