@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Shape {
     private Tetrominoe pieceShape;
     private int[][] coords;
-    private LinkedList<Tetrominoe> bag = new LinkedList<>();
+    private LinkedList<Tetrominoe> bag = new LinkedList<>(); //Список фигур, необходимый для улучшенного случайного подбора следующей фигуры
 
 
     public Shape() {
@@ -42,6 +42,9 @@ public class Shape {
         pieceShape = shape;
     }
 
+    /**
+     * Метод, выбирающий случайню фигуру из "мешка" фигур
+     */
     void setRandomShape() {
         if (bag.size() == 0) {
             bag = new LinkedList<>(Arrays.asList(Tetrominoe.values()));
@@ -59,6 +62,9 @@ public class Shape {
         return m;
     }
 
+    /**
+     * Метод поворота фигуры на 90 градусов против часовой стрелки
+     */
     public Shape rotateLeft() {
         if (pieceShape == Tetrominoe.O)
             return this;

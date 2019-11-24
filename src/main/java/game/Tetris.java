@@ -2,6 +2,7 @@ package game;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -11,8 +12,8 @@ public class Tetris extends JFrame {
     private JLabel score;
     private JLabel lines;
     private JLabel time;
-    private static final int TIME_TO_FALL = 1200;
-    private static final int TIME_DECREASE = 200;
+    private static final int TIME_TO_FALL = 1200; //Время падения фигуры на игровом поле. Чем меньше значение, тем быстрее идёт игра
+    private static final int TIME_DECREASE = 200; //Величина, на которую уменьшается время падения фигуры при увеличении скорости игры
 
     private Tetris() {
         score = new JLabel("0");
@@ -27,41 +28,39 @@ public class Tetris extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         JMenu menu = new JMenu("Game");
-        JMenuItem newg = new JMenuItem("New");
-        JMenu set = new JMenu("Settings");
+        JMenuItem newGame = new JMenuItem("New");
+        JMenu settings = new JMenu("Settings");
         JMenuItem exit = new JMenuItem("Exit");
-        JCheckBoxMenuItem solver = new JCheckBoxMenuItem("Turn on solver");
+        JCheckBoxMenuItem solver = new JCheckBoxMenuItem("Turn on/off solver");
         JMenu speed = new JMenu("Game Speed");
         JRadioButton speed1 = new JRadioButton("1", true);
         JRadioButton speed2 = new JRadioButton("2", false);
         JRadioButton speed3 = new JRadioButton("3", false);
         JRadioButton speed4 = new JRadioButton("4", false);
         JRadioButton speed5 = new JRadioButton("5", false);
-        speed1.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed1.getText())));
-        speed2.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed2.getText())));
-        speed3.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed3.getText())));
-        speed4.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed4.getText())));
-        speed5.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed5.getText())));
-        ButtonGroup gameSpeed = new ButtonGroup();
-        gameSpeed.add(speed1);
-        gameSpeed.add(speed2);
-        gameSpeed.add(speed3);
-        gameSpeed.add(speed4);
-        gameSpeed.add(speed5);
+        ActionListener speedIncrease = actionEvent -> {
+            AbstractButton aButton = (AbstractButton) actionEvent.getSource();
+            board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(aButton.getText()));
+        };
+        speed1.addActionListener(speedIncrease);
+        speed2.addActionListener(speedIncrease);
+        speed3.addActionListener(speedIncrease);
+        speed4.addActionListener(speedIncrease);
+        speed5.addActionListener(speedIncrease);
         speed.add(speed1);
         speed.add(speed2);
         speed.add(speed3);
         speed.add(speed4);
         speed.add(speed5);
         solver.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK));
-        set.add(solver).addActionListener(e -> {
+        settings.add(solver).addActionListener(e -> {
             Board.isSolverOn = !Board.isSolverOn;
             solver(board, Board.isSolverOn);
         });
-        set.add(speed);
-        menu.add(newg).addActionListener(e -> board.start());
+        settings.add(speed);
+        menu.add(newGame).addActionListener(e -> board.start());
         menu.addSeparator();
-        menu.add(set);
+        menu.add(settings);
         menu.addSeparator();
         menu.add(exit).addActionListener(e -> System.exit(0));
         JMenu help = new JMenu("Help");

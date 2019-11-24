@@ -16,18 +16,20 @@ import static game.Board.BOARD_WIDTH;
 public class Solver {
     private static Shape cur;
     private static Shape next;
-    private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>(); /////// d,3
-    private static final double PenHeight = -0.510066;
-    private static final double PenClear = 0.760666;
-    private static final double PenHole = -0.35663; //а что это и откуда это?
-    private static final double PenBump = -0.184483;
-    private static Timer solve;
+    private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>(); // Ключ - оценка данного хода, значение - список параметров данного хода (x, y, rotations)
+    private static final double PenHeight = -1.2399154102325491;//Штрафные (весовые) коэффициенты, использоуемые
+    private static final double PenClear = 1.098176085540528;   //в функции оценки возможного хода.
+    private static final double PenHole = -1.5714709821008848;  //Значения, полученые в результате выполнения
+    private static final double PenBump = -1.1674612705825878;  //генетического алгоритма
+    private static Timer solve; //Таймер, необходимый для задержки срабатывания решателя
 
-
-    public static void solver(Board gameBoard, boolean start) { /////////////
+    /**
+     * Главный метод решателя, запускаемый по таймеру, который вызывает основные методы класса (см. ниже)
+     */
+    public static void solver(Board gameBoard, boolean start) {
         if (solve == null) {
             solve = new Timer(gameBoard.timer.getDelay(), e -> {
-                solve.setDelay(gameBoard.timer.getDelay());
+                solve.setDelay(gameBoard.timer.getDelay()); //Задержка срабатывания решателя подстраивается под скорость игры
                 Tetrominoe[][] board = gameBoard.getBoard();
                 cur = gameBoard.getCurPiece();
                 next = gameBoard.getNextPiece();
@@ -44,24 +46,30 @@ public class Solver {
         }
     }
 
-    private static void makeMove(Board gameBoard) {  //////////////
+    /**
+     * Метод, который делает окончательный ход фигуры на игровом поле
+     */
+    private static void makeMove(Board gameBoard) {
         try {
-            ArrayList<Integer> bestMove = grades.lastEntry().getValue();
-            for (int i = 0; i < bestMove.get(2); i++) {  // 2 -
+            ArrayList<Integer> bestMove = grades.lastEntry().getValue(); // Список, содержащий параметры данного хода
+            for (int i = 0; i < bestMove.get(2); i++) {  // 2 - количество поворотов фигуры
                 cur = cur.rotateLeft();
             }
-            gameBoard.tryMove(cur, bestMove.get(0), bestMove.get(1)); /////////////
+            gameBoard.tryMove(cur, bestMove.get(0), bestMove.get(1)); // 0 - координата x, 1 - координата y
             gameBoard.dropDown();
         } catch (NullPointerException ignored) {
         }
     }
 
-    private static double makeGrade(Tetrominoe[][] tetrominoes, int clearedLines) { /////////////
-        int aggregateHeight = 0;
-        int holes = 0;
-        int bump = 0;
-        boolean[] heightCount = new boolean[BOARD_WIDTH];
-        int[] heights = new int[BOARD_WIDTH];
+    /**
+     * Метод, который проводит оценку данного возможного хода
+     */
+    private static double makeGrade(Tetrominoe[][] tetrominoes, int clearedLines) {
+        int aggregateHeight = 0; //Суммарная высота колонок данного экспериментального поля
+        int holes = 0; //Количество пустых клеток под непустыми в данном экспериментальном поле
+        int bump = 0; //"Перепад" высот между колонками данного экспериментального игрового поля
+        boolean[] heightCount = new boolean[BOARD_WIDTH]; //Показывает, найдена ли высшая непустая клетка для данной колонки
+        int[] heights = new int[BOARD_WIDTH]; //Массив высот
         for (int y = BOARD_HEIGHT - 1; y >= 0; y--) {
             for (int x = BOARD_WIDTH - 1; x >= 0; x--) {
                 if (tetrominoes[x][y] != Tetrominoe.NoShape) {
@@ -82,8 +90,11 @@ public class Solver {
         return PenHeight * aggregateHeight + PenClear * clearedLines + PenHole * holes + PenBump * bump;
     }
 
-    private static void gradeNext(Tetrominoe[][] tetrominoes, double gradeCur, ArrayList<Integer> currentParams) { ///////////////
-        int[] heights = gradeHeights(tetrominoes);
+    /**
+     * Метод, который рассматривает все возможные ходы следующей фигуры после возможного хода нынешней фигуры
+     */
+    private static void gradeNext(Tetrominoe[][] tetrominoes, double gradeCur, ArrayList<Integer> currentParams) {
+        int[] heights = gradeHeights(tetrominoes); //Массив высот данного экспериментального игрового поля
         for (int i = 0; i < 4; i++) {
             for (int x = BOARD_WIDTH - 1; x >= 0; x--) {
                 for (int y = BOARD_HEIGHT - 2; y >= heights[x]; y--) {
@@ -103,8 +114,11 @@ public class Solver {
         }
     }
 
+    /**
+     * Метод, который рассматривает все возможные ходы нынешней фигуры
+     */
     private static void gradeCurrent(Tetrominoe[][] tetrominoes) {
-        int[] heights = gradeHeights(tetrominoes);
+        int[] heights = gradeHeights(tetrominoes); //Массив высот данного экспериментального игрового поля
         for (int i = 0; i < 4; i++) {
             for (int x = BOARD_WIDTH - 1; x >= 0; x--) {
                 for (int y = BOARD_HEIGHT - 2; y >= heights[x]; y--) {
@@ -125,7 +139,11 @@ public class Solver {
         }
     }
 
-    static int[] gradeHeights(Tetrominoe[][] tetrominoes) { /////////// + []?
+    /**
+     * Метод, который рассчитывает высоту каждой колонки экспериментального игрового поля на момент вызова и позволяет уменьшить
+     * количество переборов для размещения фигур на экспериментальном игровом поле
+     */
+    static int[] gradeHeights(Tetrominoe[][] tetrominoes) {
         boolean[] heightCount = new boolean[BOARD_WIDTH];
         int[] heights = new int[BOARD_WIDTH];
         for (int j = BOARD_HEIGHT - 1; j >= 0; j--) {
@@ -141,7 +159,10 @@ public class Solver {
         return heights;
     }
 
-    private static void placeOnBoard(int x, int y, Tetrominoe[][] tetrominoes, Shape cur) {
+    /**
+     * Метод, который размещает данную фигуру с данными координатами на экспериментальное игровое поле
+     */
+    static void placeOnBoard(int x, int y, Tetrominoe[][] tetrominoes, Shape cur) {
         for (int i = 0; i < 4; ++i) {
             int xx = x + cur.x(i);
             int yy = y + cur.y(i);
@@ -149,6 +170,9 @@ public class Solver {
         }
     }
 
+    /**
+     * Метод подсчёта очищенных линих на экспериментальном игровом поле в результате некоторого размещения фигуры
+     */
     static int countClearedLines(Tetrominoe[][] tetrominoes) {
         int clearedLines = 0;
         for (int f = BOARD_HEIGHT - 1; f >= 0; --f) {
@@ -171,6 +195,9 @@ public class Solver {
         return clearedLines;
     }
 
+    /**
+     * Метод, проверяющий возможность размещения данной фигуры на данных координатах на данном экспериментальном игровом поле
+     */
     static boolean canPlace(Tetrominoe[][] tetrominoes, int newX, int newY, Shape shape) {
         for (int i = 0; i < 4; i++) {
             int x = newX + shape.x(i);

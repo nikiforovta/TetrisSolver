@@ -10,14 +10,15 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Board extends JPanel implements ActionListener {
-    public static final int BOARD_WIDTH = 10;
-    public static final int BOARD_HEIGHT = 22;
+    public static final int BOARD_WIDTH = 10; //Ширина игрового поля
+    public static final int BOARD_HEIGHT = 22; //Высота игрового поля
+    private static final int INITIAL_DELAY = 1000; //Задержка срабатывания таймеров при инициализации, а также коэффициент, участвующий в увеличении начисляемых очков при увеличении скорости игры
     static boolean isSolverOn = false;
     static Shape nextPiece;
     private static Next next;
     private static boolean isFallingFinished = false;
-    public Timer timer;
-    private Timer timerStats;
+    public Timer timer; //Таймер, отвечающий за падение фигур на игровом поле
+    private Timer timerStats; //Таймер, отвечающий за отображение времени игры
     public boolean isStarted = false;
     public boolean isPaused = false;
     private int numLinesRemoved = 0;
@@ -56,13 +57,13 @@ public class Board extends JPanel implements ActionListener {
         lines = parent.getLines();
         time = parent.getTime();
 
-        timerStats = new Timer(1000, e -> {
+        timerStats = new Timer(INITIAL_DELAY, e -> {
             LocalDateTime now = LocalDateTime.now();
             Duration duration = Duration.between(startTime, now);
             time.setText(format(duration));
         });
 
-        timer = new Timer(800, this);
+        timer = new Timer(INITIAL_DELAY, this);
         board = new Tetrominoe[BOARD_WIDTH][BOARD_HEIGHT];
         clearBoard();
         addKeyListener(new TetrisAdapter());
@@ -75,7 +76,7 @@ public class Board extends JPanel implements ActionListener {
     private String format(Duration duration) {
         long hours = duration.toHours();
         long mins = duration.minusHours(hours).toMinutes();
-        long seconds = duration.minusMinutes(mins).toMillis() / 1000;
+        long seconds = duration.minusMinutes(mins).toMillis() / INITIAL_DELAY;
         return String.format("%02dh %02dm %02ds", hours, mins, seconds);
     }
 
@@ -224,6 +225,10 @@ public class Board extends JPanel implements ActionListener {
 
     private void removeFullLines() {
         int numFullLines = 0;
+        final int LINES_1 = 100;
+        final int LINES_2 = 300;
+        final int LINES_3 = 700;
+        final int LINES_4 = 1500;
         for (int i = BOARD_HEIGHT - 1; i >= 0; --i) {
             boolean lineIsFull = true;
             for (int j = 0; j < BOARD_WIDTH; ++j) {
@@ -245,16 +250,16 @@ public class Board extends JPanel implements ActionListener {
             numLinesRemoved += numFullLines;
             switch (numFullLines) {
                 case 4:
-                    scoreInt += 1500 * (1000 / timer.getDelay());
+                    scoreInt += LINES_4 * (INITIAL_DELAY / timer.getDelay());
                     break;
                 case 3:
-                    scoreInt += 700 * (1000 / timer.getDelay());
+                    scoreInt += LINES_3 * (INITIAL_DELAY / timer.getDelay());
                     break;
                 case 2:
-                    scoreInt += 300 * (1000 / timer.getDelay());
+                    scoreInt += LINES_2 * (INITIAL_DELAY / timer.getDelay());
                     break;
                 case 1:
-                    scoreInt += 100 * (1000 / timer.getDelay());
+                    scoreInt += LINES_1 * (INITIAL_DELAY / timer.getDelay());
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + numFullLines);

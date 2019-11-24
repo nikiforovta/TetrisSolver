@@ -3,7 +3,7 @@ package solver;
 
 import game.Shape;
 import game.Tetrominoe;
-import jdk.internal.net.http.common.Pair;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -12,61 +12,69 @@ import static game.Board.BOARD_WIDTH;
 import static solver.Solver.*;
 
 public class GeneticWeights {
-    private static List<double[]> weights = new ArrayList<>();
-    private static List<Pair<Integer, double[]>> gradeWeights = new ArrayList<>();
-    private static Shape cur = new Shape();
+    private static List<double[]> weights; //Список геномов
+    private static List<Pair<Integer, double[]>> gradeWeights = new ArrayList<>(); //Список пар геномов и их оценки в результате соревнования
+    private static Shape cur = new Shape(); //Некоторые переменные и методы позаимствованы из класса решателя
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
-    private static NavigableMap<Double, ArrayList<double[]>> crossoverVictims = new TreeMap<>();
-    private static final int GENERATIONS = 1;
-    private static final int GENOMES_IN_GENERATION = 10;
-    private static final int TETROMINOES = 5;
-    private static final int GENOMES_NS = 3;
-    private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES];
+    private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
+    private static final int GENERATIONS = 10; //Количество поколений
+    private static final int GENOMES_IN_GENERATION = 100; //Количество геномов в поколении
+    private static final int TETROMINOES = 50; //Количество фигур за одно соревнование для одного генома
+    private static final int GENOMES_NS = 30; //Количество геномов, заменяемых в результате естественного отбора
+    private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
 
+    /**
+     * Основной метод генетического алгоритма, в котором происходит смена поколений и в результате в консоль
+     * выводятся коэффициенты для решателя
+     */
     public static void main(String[] args) {
         createFirstGeneration();
-        for (int i = 0; i < GENERATIONS; i++) {
+        for (int i = 0; i < GENERATIONS; i++) { //Запускаем цикл ндля заданного количества поколений
+            gradeWeights.clear();
             playGame();
             selection();
             createNewGeneration();
         }
-        gradeWeights.sort(Comparator.comparing(o -> o.first));
-        System.out.println(Arrays.toString(gradeWeights.get(gradeWeights.size() - 1).second));
+        System.out.println(Arrays.toString(gradeWeights.get(gradeWeights.size() - 1).getValue())); //Вывод в консоль генома с самой высокой оценкой
     }
 
+    /**
+     * Метод создания первого поколения
+     */
     private static void createFirstGeneration() {
         weights = new ArrayList<>();
         for (int i = 0; i < GENOMES_IN_GENERATION; i++) {
             double[] penalties = new double[4];
             for (int j = 0; j < 4; j++) {
-                if (i != 1) {
-                    penalties[j] = 10 * Math.random() - 5;
-                }
+                penalties[j] = 10 * Math.random() - 5; //Создание случаных чисел в диапазоне от -5.0 до 5.0
             }
             weights.add(penalties);
         }
     }
 
+    /**
+     * Метод, в котором проходит соревнование
+     */
     private static void playGame() {
         Random generate = new Random();
         for (int j = 0; j < TETROMINOES; j++) {
-            gameSet[j] = Tetrominoe.values()[generate.nextInt(Tetrominoe.values().length)];
+            gameSet[j] = Tetrominoe.values()[generate.nextInt(Tetrominoe.values().length)]; //Создание массива случайных фигур заданного размера, одинакового для всех участников данного соревнования
         }
-        for (int i = 0; i < GENOMES_IN_GENERATION; i++) {
+        for (int i = 0; i < GENOMES_IN_GENERATION; i++) { //Проведение одинаковой игры для каждого генома
             Tetrominoe[][] board = new Tetrominoe[BOARD_WIDTH][BOARD_HEIGHT];
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 for (int k = 0; k < BOARD_HEIGHT; k++) {
                     board[j][k] = Tetrominoe.NoShape;
                 }
             }
-            int cleared = 0;
+            int cleared = 0; //Количество очищенных линих - показатель эффективности данного генома
             for (int k = 0; k < TETROMINOES - 1; k++) {
                 cur.setShape(gameSet[k]);
                 next.setShape(gameSet[k + 1]);
                 gradeCurrent(board, weights.get(i));
-                cleared += makeMove(board);
+                cleared += makeMove(board); //Метод возвращает количество очищенных данным ходом линий
                 grades.clear();
             }
             Pair<Integer, double[]> weightGraded = new Pair<>(cleared, weights.get(i));
@@ -74,32 +82,42 @@ public class GeneticWeights {
         }
     }
 
+    /**
+     * Метод, который отбирает два случайных генома для скрещивания
+     */
     private static void selection() {
         Random chooser = new Random();
-        for (int i = 0; i < GENOMES_NS; i++) {
+        for (int i = 0; i < GENOMES_NS; i++) { //Выбор нужного количества случайных пар, потомки которых заменят худшие геномы
             Pair rand1 = gradeWeights.get(chooser.nextInt(gradeWeights.size()));
-            int par1Grade = (int) rand1.first;
-            double[] par1 = (double[]) rand1.second;
+            int par1Grade = (int) rand1.getKey();
+            double[] par1 = (double[]) rand1.getValue();
             Pair rand2 = gradeWeights.get(chooser.nextInt(gradeWeights.size()));
-            int par2Grade = (int) rand2.first;
-            double[] par2 = (double[]) rand1.second;
-            Double proportion = par2Grade != 0 ? ((double) par1Grade) / par2Grade : 1.0;
-            ArrayList<double[]> parents = new ArrayList<>();
-            parents.add(par1);
-            parents.add(par2);
-            crossoverVictims.put(proportion, parents);
+            while (rand1 == rand2) {
+                rand2 = gradeWeights.get(chooser.nextInt(gradeWeights.size()));
+            }
+            int par2Grade = (int) rand2.getKey();
+            double[] par2 = (double[]) rand2.getValue();
+            Double proportion = par2Grade != 0 ? ((double) par1Grade) / par2Grade : 1.0; //Отношение оценок эффективности родителей
+            ArrayList<double[]> parents = new ArrayList<>(Arrays.asList(par1, par2)); //Список родителей
+            genomsForCrossover.add(new Pair(proportion, parents)); //Добавление пары случайных геномов, которые будут участвовать в скрещивании
         }
     }
 
-    private static double[] crossover(Map.Entry<Double, ArrayList<double[]>> parents) {
+    /**
+     * Метод, который возвращает новый геном на основе геномов родителей и отношения их эффективности
+     */
+    private static double[] crossover(Pair<Double, ArrayList<double[]>> parents) {
         double[] child = new double[4];
         for (int i = 0; i < 4; i++) {
-            child[i] = parents.getValue().get(0)[i] * parents.getKey() + parents.getValue().get(1)[i];
+            child[i] = parents.getValue().get(0)[i] * parents.getKey() + parents.getValue().get(1)[i];  //Линейная комбинация родительских параметров
         }
-        mutation(child);
+        mutation(child); //Мутация ребёнка
         return child;
     }
 
+    /**
+     * Метод, добавляющий мутацию в новый геном (5% шанс на изменение случайной характеристики на 0.3)
+     */
     private static void mutation(double[] child) {
         double chance = Math.random();
         if (chance < 0.05) {
@@ -108,17 +126,22 @@ public class GeneticWeights {
         }
     }
 
+    /**
+     * Метод создания нового поколения, удаляющий наименее приспособленные геномы и добавляющий новые геномы
+     */
     private static void createNewGeneration() {
+        gradeWeights.sort(Comparator.comparing(Pair::getKey));
         for (int i = 0; i < GENOMES_NS; i++) {
-            gradeWeights.sort(Comparator.comparing(o -> o.first));
-            weights.remove(gradeWeights.get(0).second);
-            weights.add(crossover(crossoverVictims.firstEntry()));
-            crossoverVictims.remove(crossoverVictims.firstKey());
+            weights.remove(gradeWeights.get(0).getValue()); //Удаление генома с худшим результатом
+            weights.add(crossover(genomsForCrossover.get(0))); //Добавление нового ребёнка
+            genomsForCrossover.remove(0); //Удаление пары геномов из списка для скрещивания
         }
-        gradeWeights.clear();
-        crossoverVictims.clear();
     }
 
+    /**
+     * Здесь и далее приведены методы из класса решателя с незначительными изменениями (в некоторых методах передаются
+     * штрафные (весовые) коэффициенты из геномов, проходящих соревнование в данный момент)
+     */
     private static int makeMove(Tetrominoe[][] board) {
         try {
             ArrayList<Integer> bestMove = grades.lastEntry().getValue();
@@ -202,14 +225,6 @@ public class GeneticWeights {
                 }
             }
             cur = cur.rotateLeft();
-        }
-    }
-
-    private static void placeOnBoard(int x, int y, Tetrominoe[][] tetrominoes, Shape cur) {
-        for (int i = 0; i < 4; ++i) {
-            int xx = x + cur.x(i);
-            int yy = y + cur.y(i);
-            tetrominoes[xx][yy] = cur.getShape();
         }
     }
 }
