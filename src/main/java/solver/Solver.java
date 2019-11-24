@@ -16,18 +16,18 @@ import static game.Board.BOARD_WIDTH;
 public class Solver {
     private static Shape cur;
     private static Shape next;
-    private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
+    private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>(); /////// d,3
     private static final double PenHeight = -0.510066;
     private static final double PenClear = 0.760666;
-    private static final double PenHole = -0.35663;
+    private static final double PenHole = -0.35663; //а что это и откуда это?
     private static final double PenBump = -0.184483;
     private static Timer solve;
 
 
-    public static void solver(Board gameBoard, boolean start) {
-        grades = new TreeMap<>();
+    public static void solver(Board gameBoard, boolean start) { /////////////
         if (solve == null) {
-            solve = new Timer(1100, e -> {
+            solve = new Timer(gameBoard.timer.getDelay(), e -> {
+                solve.setDelay(gameBoard.timer.getDelay());
                 Tetrominoe[][] board = gameBoard.getBoard();
                 cur = gameBoard.getCurPiece();
                 next = gameBoard.getNextPiece();
@@ -44,19 +44,19 @@ public class Solver {
         }
     }
 
-    private static void makeMove(Board gameBoard) {
+    private static void makeMove(Board gameBoard) {  //////////////
         try {
             ArrayList<Integer> bestMove = grades.lastEntry().getValue();
-            for (int i = 0; i < bestMove.get(2); i++) {
+            for (int i = 0; i < bestMove.get(2); i++) {  // 2 -
                 cur = cur.rotateLeft();
             }
-            gameBoard.tryMove(cur, bestMove.get(0), bestMove.get(1));
+            gameBoard.tryMove(cur, bestMove.get(0), bestMove.get(1)); /////////////
             gameBoard.dropDown();
         } catch (NullPointerException ignored) {
         }
     }
 
-    private static double makeGrade(Tetrominoe[][] tetrominoes, int clearedLines) {
+    private static double makeGrade(Tetrominoe[][] tetrominoes, int clearedLines) { /////////////
         int aggregateHeight = 0;
         int holes = 0;
         int bump = 0;
@@ -82,7 +82,7 @@ public class Solver {
         return PenHeight * aggregateHeight + PenClear * clearedLines + PenHole * holes + PenBump * bump;
     }
 
-    private static void gradeNext(Tetrominoe[][] tetrominoes, double gradeCur, ArrayList<Integer> currentParams) {
+    private static void gradeNext(Tetrominoe[][] tetrominoes, double gradeCur, ArrayList<Integer> currentParams) { ///////////////
         int[] heights = gradeHeights(tetrominoes);
         for (int i = 0; i < 4; i++) {
             for (int x = BOARD_WIDTH - 1; x >= 0; x--) {
@@ -125,7 +125,7 @@ public class Solver {
         }
     }
 
-    private static int[] gradeHeights(Tetrominoe[][] tetrominoes) {
+    static int[] gradeHeights(Tetrominoe[][] tetrominoes) { /////////// + []?
         boolean[] heightCount = new boolean[BOARD_WIDTH];
         int[] heights = new int[BOARD_WIDTH];
         for (int j = BOARD_HEIGHT - 1; j >= 0; j--) {
@@ -149,7 +149,7 @@ public class Solver {
         }
     }
 
-    private static int countClearedLines(Tetrominoe[][] tetrominoes) {
+    static int countClearedLines(Tetrominoe[][] tetrominoes) {
         int clearedLines = 0;
         for (int f = BOARD_HEIGHT - 1; f >= 0; --f) {
             boolean lineIsFull = true;
@@ -171,7 +171,7 @@ public class Solver {
         return clearedLines;
     }
 
-    private static boolean canPlace(Tetrominoe[][] tetrominoes, int newX, int newY, Shape shape) {
+    static boolean canPlace(Tetrominoe[][] tetrominoes, int newX, int newY, Shape shape) {
         for (int i = 0; i < 4; i++) {
             int x = newX + shape.x(i);
             int y = newY + shape.y(i);

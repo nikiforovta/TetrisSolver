@@ -11,7 +11,8 @@ public class Tetris extends JFrame {
     private JLabel score;
     private JLabel lines;
     private JLabel time;
-    private boolean isSolverOn = false;
+    private static final int TIME_TO_FALL = 1200;
+    private static final int TIME_DECREASE = 200;
 
     private Tetris() {
         score = new JLabel("0");
@@ -32,21 +33,15 @@ public class Tetris extends JFrame {
         JCheckBoxMenuItem solver = new JCheckBoxMenuItem("Turn on solver");
         JMenu speed = new JMenu("Game Speed");
         JRadioButton speed1 = new JRadioButton("1", true);
-        speed1.setMnemonic('1');
         JRadioButton speed2 = new JRadioButton("2", false);
-        speed2.setMnemonic('2');
         JRadioButton speed3 = new JRadioButton("3", false);
-        speed3.setMnemonic('3');
         JRadioButton speed4 = new JRadioButton("4", false);
-        speed4.setMnemonic('4');
         JRadioButton speed5 = new JRadioButton("5", false);
-        speed5.setMnemonic('5');
-
-        speed1.addActionListener(e -> board.timer.setDelay(1000));
-        speed2.addActionListener(e -> board.timer.setDelay(800));
-        speed3.addActionListener(e -> board.timer.setDelay(600));
-        speed4.addActionListener(e -> board.timer.setDelay(300));
-        speed5.addActionListener(e -> board.timer.setDelay(100));
+        speed1.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed1.getText())));
+        speed2.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed2.getText())));
+        speed3.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed3.getText())));
+        speed4.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed4.getText())));
+        speed5.addActionListener(e -> board.timer.setDelay(TIME_TO_FALL - TIME_DECREASE * Integer.parseInt(speed5.getText())));
         ButtonGroup gameSpeed = new ButtonGroup();
         gameSpeed.add(speed1);
         gameSpeed.add(speed2);
@@ -60,8 +55,8 @@ public class Tetris extends JFrame {
         speed.add(speed5);
         solver.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK));
         set.add(solver).addActionListener(e -> {
-            isSolverOn = !isSolverOn;
-            solver(board, isSolverOn);
+            Board.isSolverOn = !Board.isSolverOn;
+            solver(board, Board.isSolverOn);
         });
         set.add(speed);
         menu.add(newg).addActionListener(e -> board.start());
@@ -76,7 +71,8 @@ public class Tetris extends JFrame {
                 "About", JOptionPane.INFORMATION_MESSAGE));
         help.add(control).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this,
                 new String[]{"Вверх - поворот влево", "Влево - переместить влево", "Вправо - переместить вправо",
-                        "Вниз - опустить на одну линию", "Пробел - опустить вниз", "P - пауза", "R - рестарт", "Shift + S - включить решателя/увеличить скорость решателя"},
+                        "Вниз - опустить на одну линию", "Пробел - опустить вниз", "P - пауза", "R - рестарт",
+                        "Shift + S - включить/выключить решателя"},
                 "Controls",
                 JOptionPane.WARNING_MESSAGE));
         menuBar.add(menu);

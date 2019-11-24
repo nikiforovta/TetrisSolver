@@ -36,7 +36,7 @@ public class Next extends JPanel {
             for (int i = 0; i < 4; ++i) {
                 int x = nextPiece.x(i);
                 int y = nextPiece.y(i);
-                drawSquare(g, (x + 1) * 30, boardTop + (5 - y - 3) * 30, nextPiece.getShape());
+                drawSquare(g, (x + 1) * 30, boardTop + (y + 2) * 30, nextPiece.getShape());
             }
         }
     }

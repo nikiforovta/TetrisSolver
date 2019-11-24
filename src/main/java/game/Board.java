@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 public class Board extends JPanel implements ActionListener {
     public static final int BOARD_WIDTH = 10;
     public static final int BOARD_HEIGHT = 22;
-
+    static boolean isSolverOn = false;
     static Shape nextPiece;
     private static Next next;
     private static boolean isFallingFinished = false;
-    Timer timer;
+    public Timer timer;
     private Timer timerStats;
     public boolean isStarted = false;
     public boolean isPaused = false;
@@ -285,10 +285,12 @@ public class Board extends JPanel implements ActionListener {
                 start();
                 dropDown();
             }
-            if (keyCode == 'p' || keyCode == 'P')
+            if (keyCode == 'p' || keyCode == 'P') {
                 pause();
-            if (isPaused)
+            }
+            if (isPaused || !isStarted || curPiece.getShape() == Tetrominoe.NoShape || Board.isSolverOn) {
                 return;
+            }
             if (!(!isStarted || curPiece.getShape() == Tetrominoe.NoShape))
                 switch (keyCode) {
                     case KeyEvent.VK_LEFT:

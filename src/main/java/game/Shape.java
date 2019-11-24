@@ -10,7 +10,7 @@ public class Shape {
     private LinkedList<Tetrominoe> bag = new LinkedList<>();
 
 
-    Shape() {
+    public Shape() {
         coords = new int[4][2];
         setShape(Tetrominoe.NoShape);
     }
@@ -35,7 +35,7 @@ public class Shape {
         return pieceShape;
     }
 
-    void setShape(Tetrominoe shape) {
+    public void setShape(Tetrominoe shape) {
         for (int i = 0; i < 4; i++) {
             System.arraycopy(shape.coords[i], 0, coords[i], 0, 2);
         }
