@@ -120,7 +120,6 @@ public class Board extends JPanel implements ActionListener {
         curPiece = nextPiece;
         nextPiece = new Shape();
         nextPiece();
-        next.repaint();
         curX = BOARD_WIDTH / 2 - 1;
         curY = BOARD_HEIGHT - 1 + curPiece.minY();
         if (!tryMove(curPiece, curX, curY - 1)) {
@@ -156,6 +155,7 @@ public class Board extends JPanel implements ActionListener {
     public void paint(Graphics g) {
         super.paint(g);
         Dimension size = getSize();
+        if (isPaused || !isStarted || curPiece.getShape() == Tetrominoe.NoShape || Board.isSolverOn)
         next.repaint();
         int boardTop = (int) size.getHeight() - BOARD_HEIGHT * squareHeight();
         for (int i = 0; i < BOARD_HEIGHT; i++) {

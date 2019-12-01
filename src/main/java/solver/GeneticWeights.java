@@ -21,14 +21,14 @@ class GeneticWeights {
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
     private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
-    private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
-    private static final int TETROMINOES = 20; //Количество фигур за одно соревнование для одного генома
-    private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
+    private static final int GENOMES_IN_GENERATION = 100; //Количество геномов в поколении
+    private static final int TETROMINOES = 100; //Количество фигур за одно соревнование для одного генома
+    private static final int GENOMES_NS = 30; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
     /**
-     * Основной метод генетического алгоритма, в котором происходит смена поколений и в результате в консоль
-     * выводятся коэффициенты для решателя
+     * Основной метод генетического алгоритма, в котором происходит смена поколений и в результате в конфигурационный
+     * файл выводятся коэффициенты для решателя.
      */
     static void startGeneration() {
         createFirstGeneration();

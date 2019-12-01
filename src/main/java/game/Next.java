@@ -9,7 +9,7 @@ public class Next extends JPanel {
     private Tetrominoe[][] boardNext;
 
     Next() {
-        setPreferredSize(new Dimension(150, 180));
+        setPreferredSize(new Dimension(150, 200));
         boardNext = new Tetrominoe[5][5];
         clearBoard();
     }
@@ -36,7 +36,7 @@ public class Next extends JPanel {
             for (int i = 0; i < 4; ++i) {
                 int x = nextPiece.x(i);
                 int y = -nextPiece.y(i);
-                drawSquare(g, (x + 1) * 30, boardTop + (y + 2) * 30, nextPiece.getShape());
+                drawSquare(g, (x + 1) * 30, boardTop + (y + 3) * 30, nextPiece.getShape());
             }
         }
     }
