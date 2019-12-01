@@ -35,13 +35,14 @@ public class Solver {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        PenHeight = Double.parseDouble(properties.getProperty("PenHeight"));
-        PenClear = Double.parseDouble(properties.getProperty("PenClear"));
-        PenHole = Double.parseDouble(properties.getProperty("PenHole"));
-        PenBump = Double.parseDouble(properties.getProperty("PenBump"));
-
         if (solve == null) {
+            Thread gen = new generationThread();
+            gen.start();
             solve = new Timer(gameBoard.timer.getDelay(), e -> {
+                PenHeight = Double.parseDouble(properties.getProperty("PenHeight"));
+                PenClear = Double.parseDouble(properties.getProperty("PenClear"));
+                PenHole = Double.parseDouble(properties.getProperty("PenHole"));
+                PenBump = Double.parseDouble(properties.getProperty("PenBump"));
                 solve.setDelay(gameBoard.timer.getDelay()); //Задержка срабатывания решателя подстраивается под скорость игры
                 Tetrominoe[][] board = gameBoard.getBoard();
                 cur = gameBoard.getCurPiece();
@@ -221,5 +222,12 @@ public class Solver {
                 return false;
         }
         return true;
+    }
+
+    private static class generationThread extends Thread {
+        @Override
+        public void run() {
+            GeneticWeights.startGeneration();
+        }
     }
 }

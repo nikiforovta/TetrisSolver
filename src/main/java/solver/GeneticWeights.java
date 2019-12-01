@@ -14,44 +14,42 @@ import static game.Board.BOARD_HEIGHT;
 import static game.Board.BOARD_WIDTH;
 import static solver.Solver.*;
 
-public class GeneticWeights {
+class GeneticWeights {
     private static List<double[]> weights; //Список геномов
     private static List<Pair<Integer, double[]>> gradeWeights = new ArrayList<>(); //Список пар геномов и их оценки в результате соревнования
     private static Shape cur = new Shape(); //Некоторые переменные и методы позаимствованы из класса решателя
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
     private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
-    private static final int GENERATIONS = 1; //Количество поколений
     private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
-    private static final int TETROMINOES = 50; //Количество фигур за одно соревнование для одного генома
-    private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора
+    private static final int TETROMINOES = 20; //Количество фигур за одно соревнование для одного генома
+    private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
     /**
      * Основной метод генетического алгоритма, в котором происходит смена поколений и в результате в консоль
      * выводятся коэффициенты для решателя
      */
-    public static void startGeneration(String[] args) {
+    static void startGeneration() {
         createFirstGeneration();
-        for (int i = 0; i < GENERATIONS; i++) { //Запускаем цикл ндля заданного количества поколений
+        while (true) { //Запускаем цикл ндля заданного количества поколений
             gradeWeights.clear();
             playGame();
             selection();
             createNewGeneration();
+            try (FileWriter writer = new FileWriter("src/main/resources/penalties.properties"); //Записываем коэффициенты в файл
+                 BufferedWriter bw = new BufferedWriter(writer)) {
+                double[] bestWeights = gradeWeights.get(gradeWeights.size() - 1).getValue();
+                bw.write("PenHeight=" + bestWeights[0]);
+                bw.newLine();
+                bw.write("PenClear=" + bestWeights[1]);
+                bw.newLine();
+                bw.write("PenHole=" + bestWeights[2]);
+                bw.newLine();
+                bw.write("PenBump=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[3]);
+            } catch (IOException ignored) {
+            }
         }
-        try (FileWriter writer = new FileWriter("src/main/resources/penalties.properties"); //Записываем коэффициенты в файл
-             BufferedWriter bw = new BufferedWriter(writer)) {
-            bw.write("PenHeight=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[0]);
-            bw.newLine();
-            bw.write("PenClear=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[1]);
-            bw.newLine();
-            bw.write("PenHole=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[2]);
-            bw.newLine();
-            bw.write("PenBump=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[3]);
-        } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
-        }
-        System.out.println("I am ready");
     }
 
     /**
