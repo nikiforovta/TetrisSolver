@@ -52,6 +52,12 @@ public class Tetris extends JFrame {
         speed.add(speed3);
         speed.add(speed4);
         speed.add(speed5);
+        ButtonGroup gameSpeed = new ButtonGroup();
+        gameSpeed.add(speed1);
+        gameSpeed.add(speed2);
+        gameSpeed.add(speed3);
+        gameSpeed.add(speed4);
+        gameSpeed.add(speed5);
         solver.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK));
         settings.add(solver).addActionListener(e -> {
             Board.isSolverOn = !Board.isSolverOn;

@@ -35,7 +35,7 @@ public class Next extends JPanel {
         if (nextPiece.getShape() != Tetrominoe.NoShape) {
             for (int i = 0; i < 4; ++i) {
                 int x = nextPiece.x(i);
-                int y = nextPiece.y(i);
+                int y = -nextPiece.y(i);
                 drawSquare(g, (x + 1) * 30, boardTop + (y + 2) * 30, nextPiece.getShape());
             }
         }

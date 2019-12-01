@@ -5,6 +5,9 @@ import game.Shape;
 import game.Tetrominoe;
 import javafx.util.Pair;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import static game.Board.BOARD_HEIGHT;
@@ -18,18 +21,17 @@ public class GeneticWeights {
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
     private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
-    private static final int GENERATIONS = 10; //Количество поколений
-    private static final int GENOMES_IN_GENERATION = 100; //Количество геномов в поколении
+    private static final int GENERATIONS = 1; //Количество поколений
+    private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
     private static final int TETROMINOES = 50; //Количество фигур за одно соревнование для одного генома
-    private static final int GENOMES_NS = 30; //Количество геномов, заменяемых в результате естественного отбора
+    private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
-
 
     /**
      * Основной метод генетического алгоритма, в котором происходит смена поколений и в результате в консоль
      * выводятся коэффициенты для решателя
      */
-    public static void main(String[] args) {
+    public static void startGeneration(String[] args) {
         createFirstGeneration();
         for (int i = 0; i < GENERATIONS; i++) { //Запускаем цикл ндля заданного количества поколений
             gradeWeights.clear();
@@ -37,7 +39,19 @@ public class GeneticWeights {
             selection();
             createNewGeneration();
         }
-        System.out.println(Arrays.toString(gradeWeights.get(gradeWeights.size() - 1).getValue())); //Вывод в консоль генома с самой высокой оценкой
+        try (FileWriter writer = new FileWriter("src/main/resources/penalties.properties"); //Записываем коэффициенты в файл
+             BufferedWriter bw = new BufferedWriter(writer)) {
+            bw.write("PenHeight=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[0]);
+            bw.newLine();
+            bw.write("PenClear=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[1]);
+            bw.newLine();
+            bw.write("PenHole=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[2]);
+            bw.newLine();
+            bw.write("PenBump=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[3]);
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
+        System.out.println("I am ready");
     }
 
     /**

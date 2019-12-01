@@ -4,11 +4,11 @@ import game.Board;
 import game.Shape;
 import game.Tetrominoe;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import javax.swing.Timer;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 import static game.Board.BOARD_HEIGHT;
 import static game.Board.BOARD_WIDTH;
@@ -17,16 +17,29 @@ public class Solver {
     private static Shape cur;
     private static Shape next;
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>(); // Ключ - оценка данного хода, значение - список параметров данного хода (x, y, rotations)
-    private static final double PenHeight = -1.2399154102325491;//Штрафные (весовые) коэффициенты, использоуемые
-    private static final double PenClear = 1.098176085540528;   //в функции оценки возможного хода.
-    private static final double PenHole = -1.5714709821008848;  //Значения, полученые в результате выполнения
-    private static final double PenBump = -1.1674612705825878;  //генетического алгоритма
+
+    private static double PenHeight; //Штрафные (весовые) коэффициенты, использоуемые
+    private static double PenClear;  //в функции оценки возможного хода.
+    private static double PenHole;   //Значения, полученые в результате выполнения
+    private static double PenBump;   //генетического алгоритма (GeneticWeights.java)
     private static Timer solve; //Таймер, необходимый для задержки срабатывания решателя
 
     /**
      * Главный метод решателя, запускаемый по таймеру, который вызывает основные методы класса (см. ниже)
      */
     public static void solver(Board gameBoard, boolean start) {
+        File file = new File("src/main/resources/penalties.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileReader(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PenHeight = Double.parseDouble(properties.getProperty("PenHeight"));
+        PenClear = Double.parseDouble(properties.getProperty("PenClear"));
+        PenHole = Double.parseDouble(properties.getProperty("PenHole"));
+        PenBump = Double.parseDouble(properties.getProperty("PenBump"));
+
         if (solve == null) {
             solve = new Timer(gameBoard.timer.getDelay(), e -> {
                 solve.setDelay(gameBoard.timer.getDelay()); //Задержка срабатывания решателя подстраивается под скорость игры
