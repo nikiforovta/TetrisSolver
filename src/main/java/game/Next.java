@@ -6,25 +6,14 @@ import java.awt.*;
 import static game.Board.nextPiece;
 
 public class Next extends JPanel {
-    private Tetrominoe[][] boardNext;
 
     Next() {
         setPreferredSize(new Dimension(150, 200));
-        boardNext = new Tetrominoe[5][5];
-        clearBoard();
     }
 
     private void drawSquare(Graphics g, int x, int y, Tetrominoe shape) {
         g.setColor(shape.color);
         g.fillRect(x + 1, y + 1, 28, 28);
-    }
-
-    private void clearBoard() {
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
-                boardNext[x][y] = Tetrominoe.NoShape;
-            }
-        }
     }
 
     @Override

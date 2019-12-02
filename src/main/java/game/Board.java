@@ -155,7 +155,7 @@ public class Board extends JPanel implements ActionListener {
     public void paint(Graphics g) {
         super.paint(g);
         Dimension size = getSize();
-        if (isPaused || !isStarted || curPiece.getShape() == Tetrominoe.NoShape || Board.isSolverOn)
+        if (!isPaused && isStarted && curPiece.getShape() != Tetrominoe.NoShape)
         next.repaint();
         int boardTop = (int) size.getHeight() - BOARD_HEIGHT * squareHeight();
         for (int i = 0; i < BOARD_HEIGHT; i++) {

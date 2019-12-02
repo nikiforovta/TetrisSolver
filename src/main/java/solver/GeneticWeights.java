@@ -5,8 +5,8 @@ import game.Shape;
 import game.Tetrominoe;
 import javafx.util.Pair;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -21,9 +21,9 @@ class GeneticWeights {
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
     private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
-    private static final int GENOMES_IN_GENERATION = 100; //Количество геномов в поколении
-    private static final int TETROMINOES = 100; //Количество фигур за одно соревнование для одного генома
-    private static final int GENOMES_NS = 30; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
+    private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
+    private static final int TETROMINOES = 20; //Количество фигур за одно соревнование для одного генома
+    private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
     /**
@@ -37,16 +37,21 @@ class GeneticWeights {
             playGame();
             selection();
             createNewGeneration();
-            try (FileWriter writer = new FileWriter("src/main/resources/penalties.properties"); //Записываем коэффициенты в файл
-                 BufferedWriter bw = new BufferedWriter(writer)) {
+            try { //Запись новых параметров в конфигурационный файл
+                FileInputStream in = new FileInputStream("src/main/resources/penalties.properties");
+                Properties props = new Properties();
+                props.load(in);
+                in.close();
+
                 double[] bestWeights = gradeWeights.get(gradeWeights.size() - 1).getValue();
-                bw.write("PenHeight=" + bestWeights[0]);
-                bw.newLine();
-                bw.write("PenClear=" + bestWeights[1]);
-                bw.newLine();
-                bw.write("PenHole=" + bestWeights[2]);
-                bw.newLine();
-                bw.write("PenBump=" + gradeWeights.get(gradeWeights.size() - 1).getValue()[3]);
+                FileOutputStream out = new FileOutputStream("src/main/resources/penalties.properties");
+                props.setProperty("PenHeight", String.valueOf(bestWeights[0]));
+                props.setProperty("PenClear", String.valueOf(bestWeights[1]));
+                props.setProperty("PenHole", String.valueOf(bestWeights[2]));
+                props.setProperty("PenBump", String.valueOf(bestWeights[3]));
+                props.store(out, "Factors are updated automatically during the " +
+                        "startGeneration method from the GeneticWeights class.");
+                out.close();
             } catch (IOException ignored) {
             }
         }
