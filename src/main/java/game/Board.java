@@ -21,10 +21,10 @@ public class Board extends JPanel implements ActionListener {
     private Timer timerStats; //Таймер, отвечающий за отображение времени игры
     public boolean isStarted = false;
     public boolean isPaused = false;
-    private int numLinesRemoved = 0;
+    public int numLinesRemoved = 0;
     private int curX = 0;
     private int curY = 0;
-    private int scoreInt = 0;
+    public int scoreInt = 0;
     private JLabel score;
     private JLabel lines;
     private JLabel time;
@@ -44,7 +44,7 @@ public class Board extends JPanel implements ActionListener {
         return nextPiece;
     }
 
-    Board(Tetris parent) {
+    public Board(Tetris parent) {
         setFocusable(true);
         setPreferredSize(new Dimension(260, 460));
         next = new Next();
@@ -88,7 +88,7 @@ public class Board extends JPanel implements ActionListener {
         return (int) getSize().getHeight() / BOARD_HEIGHT;
     }
 
-    private Tetrominoe shapeAt(int x, int y) {
+    public Tetrominoe shapeAt(int x, int y) {
         return board[x][y];
     }
 
@@ -116,7 +116,7 @@ public class Board extends JPanel implements ActionListener {
         nextPiece.setRandomShape();
     }
 
-    private void newPiece() {
+    public void newPiece() {
         curPiece = nextPiece;
         nextPiece = new Shape();
         nextPiece();
@@ -223,7 +223,7 @@ public class Board extends JPanel implements ActionListener {
         return true;
     }
 
-    private void removeFullLines() {
+    public void removeFullLines() {
         int numFullLines = 0;
         final int LINES_1 = 100;
         final int LINES_2 = 300;

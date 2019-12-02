@@ -15,7 +15,7 @@ public class Tetris extends JFrame {
     private static final int TIME_TO_FALL = 1200; //Время падения фигуры на игровом поле. Чем меньше значение, тем быстрее идёт игра
     private static final int TIME_DECREASE = 200; //Величина, на которую уменьшается время падения фигуры при увеличении скорости игры
 
-    private Tetris() {
+    public Tetris() {
         score = new JLabel("0");
         lines = new JLabel("0");
         time = new JLabel("0h 00mm 00ss");
