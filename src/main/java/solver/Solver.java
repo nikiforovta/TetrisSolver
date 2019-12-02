@@ -28,17 +28,16 @@ public class Solver {
      * Главный метод решателя, запускаемый по таймеру, который вызывает основные методы класса (см. ниже)
      */
     public static void solver(Board gameBoard, boolean start) {
-        File file = new File("src/main/resources/penalties.properties");
+        File file = new File("src/main/resources/META-INF/penalties.properties");
         Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         if (solve == null) {
             Thread gen = new generationThread();
             gen.start();
             solve = new Timer(gameBoard.timer.getDelay(), e -> {
+                try {
+                    properties.load(new FileReader(file));
+                } catch (IOException ignored) {
+                }
                 PenHeight = Double.parseDouble(properties.getProperty("PenHeight"));
                 PenClear = Double.parseDouble(properties.getProperty("PenClear"));
                 PenHole = Double.parseDouble(properties.getProperty("PenHole"));

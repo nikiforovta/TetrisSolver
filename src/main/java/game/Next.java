@@ -5,7 +5,7 @@ import java.awt.*;
 
 import static game.Board.nextPiece;
 
-public class Next extends JPanel {
+class Next extends JPanel {
 
     Next() {
         setPreferredSize(new Dimension(150, 200));

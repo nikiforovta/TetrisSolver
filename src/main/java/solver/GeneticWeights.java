@@ -20,9 +20,9 @@ class GeneticWeights {
     private static Shape cur = new Shape(); //Некоторые переменные и методы позаимствованы из класса решателя
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
-    private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
+    private static List<Pair<Double, ArrayList<double[]>>> genomesForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
     private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
-    private static final int TETROMINOES = 20; //Количество фигур за одно соревнование для одного генома
+    private static final int TETROMINOES = 100; //Количество фигур за одно соревнование для одного генома
     private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
@@ -38,7 +38,7 @@ class GeneticWeights {
             selection();
             createNewGeneration();
             try { //Запись новых параметров в конфигурационный файл
-                FileInputStream in = new FileInputStream("src/main/resources/penalties.properties");
+                FileInputStream in = new FileInputStream("src/main/resources/META-INF/penalties.properties");
                 Properties props = new Properties();
                 props.load(in);
                 in.close();
@@ -116,7 +116,7 @@ class GeneticWeights {
             double[] par2 = (double[]) rand2.getValue();
             Double proportion = par2Grade != 0 ? ((double) par1Grade) / par2Grade : 1.0; //Отношение оценок эффективности родителей
             ArrayList<double[]> parents = new ArrayList<>(Arrays.asList(par1, par2)); //Список родителей
-            genomsForCrossover.add(new Pair(proportion, parents)); //Добавление пары случайных геномов, которые будут участвовать в скрещивании
+            genomesForCrossover.add(new Pair(proportion, parents)); //Добавление пары случайных геномов, которые будут участвовать в скрещивании
         }
     }
 
@@ -150,8 +150,8 @@ class GeneticWeights {
         gradeWeights.sort(Comparator.comparing(Pair::getKey));
         for (int i = 0; i < GENOMES_NS; i++) {
             weights.remove(gradeWeights.get(0).getValue()); //Удаление генома с худшим результатом
-            weights.add(crossover(genomsForCrossover.get(0))); //Добавление нового ребёнка
-            genomsForCrossover.remove(0); //Удаление пары геномов из списка для скрещивания
+            weights.add(crossover(genomesForCrossover.get(0))); //Добавление нового ребёнка
+            genomesForCrossover.remove(0); //Удаление пары геномов из списка для скрещивания
         }
     }
 

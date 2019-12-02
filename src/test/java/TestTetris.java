@@ -1,2 +1,2 @@
-public class TestTetris {
+class TestTetris {
 }

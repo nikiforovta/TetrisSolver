@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 
 import static solver.Solver.solver;
 
-public class Tetris extends JFrame {
+class Tetris extends JFrame {
     private JLabel score;
     private JLabel lines;
     private JLabel time;
@@ -72,7 +72,8 @@ public class Tetris extends JFrame {
         JMenu help = new JMenu("Help");
         JMenuItem about = new JMenuItem("About");
         JMenuItem control = new JMenuItem("Controls");
-        help.add(about).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this, "Это Тетрис. С решателем.",
+        help.add(about).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this, "Это Тетрис. С решателем. " +
+                        "Не ругайте его, теперь он учится.",
                 "About", JOptionPane.INFORMATION_MESSAGE));
         help.add(control).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this,
                 new String[]{"Вверх - поворот влево", "Влево - переместить влево", "Вправо - переместить вправо",
