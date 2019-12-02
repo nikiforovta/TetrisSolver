@@ -5,9 +5,6 @@ import game.Shape;
 import game.Tetrominoe;
 import javafx.util.Pair;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 import static game.Board.BOARD_HEIGHT;
@@ -22,7 +19,7 @@ class GeneticWeights {
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
     private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
     private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
-    private static final int TETROMINOES = 20; //Количество фигур за одно соревнование для одного генома
+    private static final int TETROMINOES = 100; //Количество фигур за одно соревнование для одного генома
     private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
@@ -32,28 +29,17 @@ class GeneticWeights {
      */
     static void startGeneration() {
         createFirstGeneration();
-        while (true) { //Запускаем цикл ндля заданного количества поколений
+        while (true) { //Запускаем цикл для постепенного улучшения изначальных коэффициентов
             gradeWeights.clear();
             playGame();
             selection();
             createNewGeneration();
-            try { //Запись новых параметров в конфигурационный файл
-                FileInputStream in = new FileInputStream("src/main/resources/penalties.properties");
-                Properties props = new Properties();
-                props.load(in);
-                in.close();
 
-                double[] bestWeights = gradeWeights.get(gradeWeights.size() - 1).getValue();
-                FileOutputStream out = new FileOutputStream("src/main/resources/penalties.properties");
-                props.setProperty("PenHeight", String.valueOf(bestWeights[0]));
-                props.setProperty("PenClear", String.valueOf(bestWeights[1]));
-                props.setProperty("PenHole", String.valueOf(bestWeights[2]));
-                props.setProperty("PenBump", String.valueOf(bestWeights[3]));
-                props.store(out, "Factors are updated automatically during the " +
-                        "startGeneration method from the GeneticWeights class.");
-                out.close();
-            } catch (IOException ignored) {
-            }
+            double[] bestWeights = gradeWeights.get(gradeWeights.size() - 1).getValue(); //Обновляем весовые коэффициенты
+            setPenHeight(bestWeights[0]);
+            setPenClear(bestWeights[1]);
+            setPenHole(bestWeights[2]);
+            setPenBump(bestWeights[3]);
         }
     }
 

@@ -4,11 +4,11 @@ import game.Board;
 import game.Shape;
 import game.Tetrominoe;
 
-import javax.swing.Timer;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import static game.Board.BOARD_HEIGHT;
 import static game.Board.BOARD_WIDTH;
@@ -18,31 +18,36 @@ public class Solver {
     private static Shape next;
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>(); // Ключ - оценка данного хода, значение - список параметров данного хода (x, y, rotations)
 
-    private static double PenHeight; //Штрафные (весовые) коэффициенты, использоуемые
-    private static double PenClear;  //в функции оценки возможного хода.
-    private static double PenHole;   //Значения, полученые в результате выполнения
-    private static double PenBump;   //генетического алгоритма (GeneticWeights.java)
+    private static double PenHeight = -0.5; //Штрафные (весовые) коэффициенты, используемые
+    private static double PenClear = 1.0;   //в функции оценки возможного хода. Изначально заданы примерные значения.
+    private static double PenHole = -1.5;   //Далее значения будут меняться в ходе выполнения метода startGeneration
+    private static double PenBump = -1.0;   //из класса GeneticWeights.java
     private static Timer solve; //Таймер, необходимый для задержки срабатывания решателя
+
+    static void setPenHeight(double penHeight) {
+        PenHeight = penHeight;
+    }
+
+    static void setPenClear(double penClear) {
+        PenClear = penClear;
+    }
+
+    static void setPenHole(double penHole) {
+        PenHole = penHole;
+    }
+
+    static void setPenBump(double penBump) {
+        PenBump = penBump;
+    }
 
     /**
      * Главный метод решателя, запускаемый по таймеру, который вызывает основные методы класса (см. ниже)
      */
     public static void solver(Board gameBoard, boolean start) {
-        File file = new File("src/main/resources/penalties.properties");
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         if (solve == null) {
             Thread gen = new generationThread();
             gen.start();
             solve = new Timer(gameBoard.timer.getDelay(), e -> {
-                PenHeight = Double.parseDouble(properties.getProperty("PenHeight"));
-                PenClear = Double.parseDouble(properties.getProperty("PenClear"));
-                PenHole = Double.parseDouble(properties.getProperty("PenHole"));
-                PenBump = Double.parseDouble(properties.getProperty("PenBump"));
                 solve.setDelay(gameBoard.timer.getDelay()); //Задержка срабатывания решателя подстраивается под скорость игры
                 Tetrominoe[][] board = gameBoard.getBoard();
                 cur = gameBoard.getCurPiece();
