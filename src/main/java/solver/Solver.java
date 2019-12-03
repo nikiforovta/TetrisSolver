@@ -162,7 +162,7 @@ public class Solver {
      * Метод, который рассчитывает высоту каждой колонки экспериментального игрового поля на момент вызова и позволяет уменьшить
      * количество переборов для размещения фигур на экспериментальном игровом поле
      */
-    static int[] gradeHeights(Tetrominoe[][] tetrominoes) {
+    public static int[] gradeHeights(Tetrominoe[][] tetrominoes) {
         boolean[] heightCount = new boolean[BOARD_WIDTH];
         int[] heights = new int[BOARD_WIDTH];
         for (int j = BOARD_HEIGHT - 1; j >= 0; j--) {
@@ -181,7 +181,7 @@ public class Solver {
     /**
      * Метод, который размещает данную фигуру с данными координатами на экспериментальное игровое поле
      */
-    static void placeOnBoard(int x, int y, Tetrominoe[][] tetrominoes, Shape cur) {
+    public static void placeOnBoard(int x, int y, Tetrominoe[][] tetrominoes, Shape cur) {
         for (int i = 0; i < 4; ++i) {
             int xx = x + cur.x(i);
             int yy = y + cur.y(i);
@@ -192,7 +192,7 @@ public class Solver {
     /**
      * Метод подсчёта очищенных линих на экспериментальном игровом поле в результате некоторого размещения фигуры
      */
-    static int countClearedLines(Tetrominoe[][] tetrominoes) {
+    public static int countClearedLines(Tetrominoe[][] tetrominoes) {
         int clearedLines = 0;
         for (int f = BOARD_HEIGHT - 1; f >= 0; --f) {
             boolean lineIsFull = true;
@@ -217,7 +217,7 @@ public class Solver {
     /**
      * Метод, проверяющий возможность размещения данной фигуры на данных координатах на данном экспериментальном игровом поле
      */
-    static boolean canPlace(Tetrominoe[][] tetrominoes, int newX, int newY, Shape shape) {
+    public static boolean canPlace(Tetrominoe[][] tetrominoes, int newX, int newY, Shape shape) {
         for (int i = 0; i < 4; i++) {
             int x = newX + shape.x(i);
             int y = newY + shape.y(i);
