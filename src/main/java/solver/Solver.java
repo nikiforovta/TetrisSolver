@@ -24,19 +24,36 @@ public class Solver {
     private static double PenBump = -1.0;   //из класса GeneticWeights.java
     private static Timer solve; //Таймер, необходимый для задержки срабатывания решателя
 
-    static void setPenHeight(double penHeight) {
+
+    public static double getPenHeight() {
+        return PenHeight;
+    }
+
+    public static double getPenClear() {
+        return PenClear;
+    }
+
+    public static double getPenHole() {
+        return PenHole;
+    }
+
+    public static double getPenBump() {
+        return PenBump;
+    }
+
+    public static void setPenHeight(double penHeight) {
         PenHeight = penHeight;
     }
 
-    static void setPenClear(double penClear) {
+    public static void setPenClear(double penClear) {
         PenClear = penClear;
     }
 
-    static void setPenHole(double penHole) {
+    public static void setPenHole(double penHole) {
         PenHole = penHole;
     }
 
-    static void setPenBump(double penBump) {
+    public static void setPenBump(double penBump) {
         PenBump = penBump;
     }
 
@@ -58,7 +75,7 @@ public class Solver {
             });
         }
         solve.start();
-        if (start && !gameBoard.isPaused && gameBoard.isStarted) {
+        if (start && !gameBoard.isPaused && gameBoard.isStarted && !(gameBoard.getCurPiece().getShape() == Tetrominoe.NoShape)) {
             solve.start();
         } else {
             solve.stop();

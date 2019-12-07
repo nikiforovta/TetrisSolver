@@ -11,16 +11,16 @@ import static game.Board.BOARD_HEIGHT;
 import static game.Board.BOARD_WIDTH;
 import static solver.Solver.*;
 
-class GeneticWeights {
-    private static List<double[]> weights; //Список геномов
+public class GeneticWeights {
+    public static List<double[]> weights; //Список геномов
     private static List<Pair<Integer, double[]>> gradeWeights = new ArrayList<>(); //Список пар геномов и их оценки в результате соревнования
     private static Shape cur = new Shape(); //Некоторые переменные и методы позаимствованы из класса решателя
     private static Shape next = new Shape();
     private static NavigableMap<Double, ArrayList<Integer>> grades = new TreeMap<>();
     private static List<Pair<Double, ArrayList<double[]>>> genomsForCrossover = new ArrayList<>(); //Список пар геномов, которым предстоит скрещивание и отношение их оценок в результате соревнования
     private static final int GENOMES_IN_GENERATION = 10; //Количество геномов в поколении
-    private static final int TETROMINOES = 100; //Количество фигур за одно соревнование для одного генома
-    private static final int GENOMES_NS = 3; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
+    private static final int TETROMINOES = 1000; //Количество фигур за одно соревнование для одного генома
+    private static final int GENOMES_NS = 300; //Количество геномов, заменяемых в результате естественного отбора (30% от GENOMES_IN_GENERATION)
     private static Tetrominoe[] gameSet = new Tetrominoe[TETROMINOES]; //Массив фигур, которые будут во время соревнования у геномов
 
     /**
@@ -46,7 +46,7 @@ class GeneticWeights {
     /**
      * Метод создания первого поколения
      */
-    private static void createFirstGeneration() {
+    public static void createFirstGeneration() {
         weights = new ArrayList<>();
         for (int i = 0; i < GENOMES_IN_GENERATION; i++) {
             double[] penalties = new double[4];

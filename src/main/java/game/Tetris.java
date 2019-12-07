@@ -1,5 +1,8 @@
 package game;
 
+import solver.GeneticWeights;
+import solver.Solver;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -32,6 +35,7 @@ public class Tetris extends JFrame {
         JMenu settings = new JMenu("Settings");
         JMenuItem exit = new JMenuItem("Exit");
         JCheckBoxMenuItem solver = new JCheckBoxMenuItem("Turn on/off solver");
+        JMenuItem resetGenetic = new JMenuItem("Reset genesis");
         JMenu speed = new JMenu("Game Speed");
         JRadioButton speed1 = new JRadioButton("1", true);
         JRadioButton speed2 = new JRadioButton("2", false);
@@ -63,6 +67,15 @@ public class Tetris extends JFrame {
             Board.isSolverOn = !Board.isSolverOn;
             solver(board, Board.isSolverOn);
         });
+        resetGenetic.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.SHIFT_MASK));
+        settings.add(resetGenetic).addActionListener(e -> {
+            Solver.setPenHeight(-0.5);
+            Solver.setPenClear(1.0);
+            Solver.setPenHole(-1.5);
+            Solver.setPenBump(-1.0);
+            GeneticWeights.weights.clear();
+            GeneticWeights.createFirstGeneration();
+        });
         settings.add(speed);
         menu.add(newGame).addActionListener(e -> board.start());
         menu.addSeparator();
@@ -72,15 +85,23 @@ public class Tetris extends JFrame {
         JMenu help = new JMenu("Help");
         JMenuItem about = new JMenuItem("About");
         JMenuItem control = new JMenuItem("Controls");
+        JMenuItem factors = new JMenuItem("Factors");
         help.add(about).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this, "Это Тетрис. С решателем. " +
                         "Не ругайте его, он теперь учится.",
                 "About", JOptionPane.INFORMATION_MESSAGE));
         help.add(control).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this,
                 new String[]{"Вверх - поворот влево", "Влево - переместить влево", "Вправо - переместить вправо",
                         "Вниз - опустить на одну линию", "Пробел - опустить вниз", "P - пауза", "R - рестарт",
-                        "Shift + S - включить/выключить решателя"},
+                        "Shift + S - включить/выключить решателя", "Shift + G - сброс штрафных параметров"},
                 "Controls",
                 JOptionPane.WARNING_MESSAGE));
+        help.add(factors).addActionListener(e -> JOptionPane.showMessageDialog(Tetris.this,
+                new String[]{"\"Штраф\" за высоту " + Solver.getPenHeight(),
+                        "\"Штраф\" за очищенные линии " + Solver.getPenClear(),
+                        "\"Штраф\" за наличие дырок " + Solver.getPenHole(),
+                        "\"Штраф\" за перепад высот " + Solver.getPenBump()},
+                "Factors",
+                JOptionPane.ERROR_MESSAGE));
         menuBar.add(menu);
         menuBar.add(help);
         Next next = Board.getNext();
