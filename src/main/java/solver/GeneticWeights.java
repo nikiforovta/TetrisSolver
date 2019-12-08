@@ -51,7 +51,7 @@ public class GeneticWeights {
         for (int i = 0; i < GENOMES_IN_GENERATION; i++) {
             double[] penalties = new double[4];
             for (int j = 0; j < 4; j++) {
-                penalties[j] = 10 * Math.random() - 5; //Создание случаных чисел в диапазоне от -5.0 до 5.0
+                penalties[j] = 10 * Math.random() - 5; //Создание случайных чисел в диапазоне от -5.0 до 5.0
             }
             weights.add(penalties);
         }
@@ -72,7 +72,7 @@ public class GeneticWeights {
                     board[j][k] = Tetrominoe.NoShape;
                 }
             }
-            int cleared = 0; //Количество очищенных линих - показатель эффективности данного генома
+            int cleared = 0; //Количество очищенных линий - показатель эффективности данного генома
             for (int k = 0; k < TETROMINOES - 1; k++) {
                 cur.setShape(gameSet[k]);
                 next.setShape(gameSet[k + 1]);

@@ -98,7 +98,7 @@ class TestTetris {
         assertEquals(22, Solver.countClearedLines(board)); //Проверяем, что очистилось всё поле
     }
 
-    //Проверка размещения фигруы на экспериментальном поле
+    //Проверка размещения фигуры на экспериментальном поле
     @Test
     void testPlaceOnBoard() {
         Tetrominoe[][] board = testBoard.getBoard();
@@ -117,7 +117,7 @@ class TestTetris {
     void testGradeHeights() {
         Tetrominoe[][] board = testBoard.getBoard();
         for (int i = 0; i < BOARD_WIDTH; i++) {
-            board[i][i + 5] = Tetrominoe.T; //Рзмещаем фигуру на поле
+            board[i][i + 5] = Tetrominoe.T; //Размещаем фигуру на поле
         }
         int[] heights = Solver.gradeHeights(board); //Подсчитываем высоты колонок
         for (int i = 0; i < BOARD_WIDTH; i++) {
